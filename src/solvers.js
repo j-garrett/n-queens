@@ -30,12 +30,6 @@ window.findNRooksSolution = function(n) {
       solution.togglePiece(allowedRows.pop(), allowedCols.pop());
     }
   };
-  
-  // //should we just brute force every single check?
-  // for (var i2 = 0; i2 < n; i2++) {
-  //   var indices = [i2];
-  //   //if no column or row conflicts then push value in here
-  // }
 
   fillBoard(allowedRows, allowedCols);
 
@@ -46,10 +40,57 @@ window.findNRooksSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solution = undefined; //fixme
 
-  console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
-  return solutionCount;
+  
+  var solutions = [];
+  var start = 0;
+
+  var buildSolutions = function(startPoint) {
+    var board = new Board({'n': n});
+    for (var i = startPoint; i < n; i++) {
+      for (var i2 = 0; i2 < n; i2++) {
+        board.togglePiece(i, i2);
+        if (board.hasAnyRooksConflicts() === true) {
+          board.togglePiece(i, i2);
+        }
+      }
+    }
+    start++;
+    
+    solutions.push(board.rows());
+  };
+
+  for (var j = 0; j < n; j++) {
+    buildSolutions(j);
+  }
+  // console.table(solutions);
+  console.table(solutions);
+  return solutions.length;
+  // var solution = new Board( {'n': n}); //fixme
+  // var allowedRows = []; 
+  // var allowedCols = []; 
+
+
+  // // Need to reset allowed rows/cols
+  // for (var i = 0; i < n; i++) {
+  //   allowedRows.push(i); 
+  //   allowedCols.push(i); 
+  // }
+
+  // var fillBoard = function (allowedRows, allowedCols) {
+  //   for (var i = 0; i < n; i++) {
+  //     for (var j = 0; j < n; j++) {
+  //       solution.togglePiece(allowedRows.splice(i + j, 1), allowedCols.splice(i, 1));
+  //     }
+  //   }
+  // };
+
+  // fillBoard(allowedRows, allowedCols);
+
+  // solution = solution.rows();
+
+  // console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
+  // return solutionCount;
 };
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
