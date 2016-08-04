@@ -16,9 +16,31 @@
 
 
 window.findNRooksSolution = function(n) {
-  var solution = undefined; //fixme
+  var solution = new Board({'n': n}); //fixme
+  var allowedRows = [];
+  var allowedCols = [];
 
-  console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
+  for (var i = 0; i < n; i++) {
+    allowedRows.push(i);
+    allowedCols.push(i);
+  }
+  
+  var fillBoard = function (allowedRows, allowedCols) {
+    for (var i = 0; i < n; i++) {
+      solution.togglePiece(allowedRows.pop(), allowedCols.pop());
+    }
+  };
+  
+  // //should we just brute force every single check?
+  // for (var i2 = 0; i2 < n; i2++) {
+  //   var indices = [i2];
+  //   //if no column or row conflicts then push value in here
+  // }
+
+  fillBoard(allowedRows, allowedCols);
+
+  solution = solution.rows();
+
   return solution;
 };
 
