@@ -37,7 +37,6 @@ window.findNRooksSolution = function(n) {
    
   return solution;
 };
-
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
   var solutions = [];
@@ -56,139 +55,100 @@ window.countNRooksSolutions = function(n) {
         columnChoices.splice(i, 1);
         currentGameValues.push(curRow);
         //pass remaining values to next recursion
-        fillBoard(row++, columnChoices, currentGameValues);
+        fillBoard(row + 1, columnChoices, currentGameValues);
       }
     } else {
       solutions.push(currentGameValues);
       return;
     }
   };
-
   fillBoard(0, possibleColumns);
-
   return solutions.length;
-
-
-
-
-
-
-
-
-
-  // // var buildSolutions = function(startX, startY) {
-  // //   var board = new Board({'n': n});
-  // //   board.togglePiece(startX, startY); 
-  // //   for (var i = startX; i < n; i++) {
-  // //     for (var x = startY; x < n; x++) {
-  // //       board.togglePiece(i, x);
-  // //       if (board.hasAnyRooksConflicts() === true) {
-  // //         board.togglePiece(i, x);
-  // //       }
-  // //     }
-  // //   }
-  // //   console.log('Board for n value of', n);
-  // //   console.table(board.rows());
-  // //   solutions.push(board.rows());
-  // // };
-
-  // // for (var j = 0; j < n; j++) {
-  // //   for (var k = 0; k < n; k++) {
-  // //     buildSolutions(j, k);
-  // //   }
-  // // }
-  // // // console.table(solutions);
-  // // // console.table(solutions);
-  // // return solutions.length;
-
-  // // Build a working board
-  // var getSolutions = function(rowPosition, colPosition) {
-  //   var board = insertPiece(rowPosition, colPosition); 
-
-  //   for (var x = 0; x < n; x++) {
-  //     for (var y = 0; y < n; y++) {
-  //       // console.log([x, y]); 
-  //       if (board.get(x)[y] === 1) {
-  //         board.get(x)[y] = 1; 
-  //       } else {
-  //         board.togglePiece(x, y); 
-  //         if (board.hasAnyRooksConflicts() === true) {
-  //           board.togglePiece(x, y); 
-  //         }
-  //       }
-  //     }
-  //   }
-
-  //   console.table(board.rows()); 
-  //   return board.rows(); 
-  // }; 
-
-  // var insertPiece = function(rowPosition, colPosition) {
-  //   // Create a new board of n length
-  //   var board = new Board( {'n': n});
-    
-  //   board.togglePiece(rowPosition, colPosition); 
-     
-
-  //   // console.table(board.rows()); 
-  //   return board; 
-
-  // };
-
- 
-
-  // for (var rowPosition = 0; rowPosition < n; rowPosition++) {
-  //   for (var colPosition = 0; colPosition < n; colPosition++) {
-  //     solutions.push(getSolutions(rowPosition, colPosition));  
-  //   }
-  // }
-  
-  // var half = solutions.length / 2; 
-  // var answer = solutions.splice(0, half + 1); 
-  // return parseInt(answer); 
-
-
-
-
-  // // var solution = new Board( {'n': n}); //fixme
-  // // var allowedRows = []; 
-  // // var allowedCols = []; 
-
-
-  // // // Need to reset allowed rows/cols
-  // // for (var i = 0; i < n; i++) {
-  // //   allowedRows.push(i); 
-  // //   allowedCols.push(i); 
-  // // }
-
-  // // var fillBoard = function (allowedRows, allowedCols) {
-  // //   for (var i = 0; i < n; i++) {
-  // //     for (var j = 0; j < n; j++) {
-  // //       solution.togglePiece(allowedRows.splice(i + j, 1), allowedCols.splice(i, 1));
-  // //     }
-  // //   }
-  // // };
-
-  // // fillBoard(allowedRows, allowedCols);
-
-  // // solution = solution.rows();
-
-  // // console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
-  // // return solutionCount;
 };
-
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var solution = undefined; //fixme
+  var solution = new Board({'n': n}); //fixme
+  var allowedCols = _.range(n);
+  var minDiags = []; 
+  var majDiags = []; 
+  
+  var fillBoard = function (row, allowedCols, minDiags, majDiags, currentBoardValue) {
+    for (var i = 0; i < n; i++) {
+      solution.togglePiece(allowedRows.pop(), allowedCols.pop());
+    }
+  };
 
+  fillBoard(allowedRows, allowedCols);
+
+  solution = solution.rows();
+   
   console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
   return solution;
 };
-
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
-  var solution = undefined; //fixme
+  var solutions = [];
+  var minDiags = []; 
+  var majDiags = []; 
+  var possibleColumns = _.range(n);
+  if (n === 0) {
+    return 1;
+  }
+  var fillBoard = function(row, possibleColumns, minDiags, majDiags, currentGameValues) {
+    currentGameValues = currentGameValues || [];
 
-  console.log('Number of solutions for ' + n + ' queens:', solutionCount);
-  return solutionCount;
+    debugger;
+
+    if (possibleColumns.length > 0 && row < n) {
+      //loop through elements in possibleColumns
+      for (var i = 0; i < possibleColumns.length; i++) {
+        var columnChoices = possibleColumns.slice(); // Copy of the array
+        var usedMinDiags = minDiags.slice();
+        var usedMajDiags = majDiags.slice();
+        // If current spot has major or minor diag conflicts
+        var min = columnChoices[i] - row;
+        var maj = columnChoices[i] + row; 
+
+        if (usedMinDiags.includes(min) || usedMajDiags.includes(maj)) {
+          if (possibleColumns.length > 0) {
+            fillBoard(row + 1, columnChoices, usedMinDiags, usedMajDiags, currentGameValues);
+          }
+          continue; 
+        }
+
+        //create current row with possible values and current row passed to function call
+        var curRow = [row, columnChoices[i]];
+        //splice out current i element from column choices
+        columnChoices.splice(i, 1);
+        currentGameValues.push(curRow);
+        usedMinDiags.push(min); 
+        usedMajDiags.push(maj); 
+        //pass remaining values to next recursion
+        fillBoard(row + 1, columnChoices, usedMinDiags, usedMajDiags, currentGameValues);
+      }
+    } else {
+      if (currentGameValues.length === n) {
+        solutions.push(currentGameValues);
+      }
+      return;
+    }
+  };
+
+  fillBoard(0, possibleColumns, minDiags, majDiags);
+  console.table(solutions);
+  console.log('Number of solutions for ' + n + ' queens:', solutions);
+  return solutions.length;
+
 };
+
+
+
+
+
+
+
+
+
+
+
+
