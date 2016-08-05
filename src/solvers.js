@@ -39,6 +39,7 @@ window.findNRooksSolution = function(n) {
 };
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
+  var start = new Date();
   var solutions = [];
   var possibleColumns = _.range(n);
 
@@ -63,6 +64,9 @@ window.countNRooksSolutions = function(n) {
     }
   };
   fillBoard(0, possibleColumns);
+  var end = new Date();
+  //console.table (solutions);
+  console.log( end - start);
   return solutions.length;
 };
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
@@ -87,51 +91,95 @@ window.findNQueensSolution = function(n) {
 };
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
+  if (n === 0) {
+    return 1;
+  }
   var solutions = [];
   var minDiags = []; 
   var majDiags = []; 
   var possibleColumns = _.range(n);
-  if (n === 0) {
-    return 1;
-  }
+
   var fillBoard = function(row, possibleColumns, minDiags, majDiags, currentGameValues) {
-    currentGameValues = currentGameValues || [];
-
-    debugger;
-
+    if (n === 4) {
+      debugger;
+    }
+    var usedMinDiags = minDiags.slice();
+    var usedMajDiags = majDiags.slice();
     if (possibleColumns.length > 0 && row < n) {
-      //loop through elements in possibleColumns
       for (var i = 0; i < possibleColumns.length; i++) {
-        var columnChoices = possibleColumns.slice(); // Copy of the array
-        var usedMinDiags = minDiags.slice();
-        var usedMajDiags = majDiags.slice();
-        // If current spot has major or minor diag conflicts
-        var min = columnChoices[i] - row;
-        var maj = columnChoices[i] + row; 
-
-        if (usedMinDiags.includes(min) || usedMajDiags.includes(maj)) {
-          if (possibleColumns.length > 0) {
-            fillBoard(row + 1, columnChoices, usedMinDiags, usedMajDiags, currentGameValues);
-          }
-          continue; 
+        var columnChoices = possibleColumns.slice();
+        var minDiag = columnChoices[i] - row;
+        var majDiag = columnChoices[i] + row;
+        //if current value does not conflict with used diagonal indexes
+        if (usedMinDiags.includes(minDiag) !== true && usedMajDiags.includes(majDiag) !== true) {
+          //push current value to possible solutions
+          var posSolution = currentGameValues || [];
+          posSolution.push([row, columnChoices[i]]);
+          //update used Diagonals
+          usedMinDiags.push(minDiag);
+          usedMajDiags.push(majDiag);
+          //remove index from future possible columns
+          columnChoices.splice(i, 1);
+          //call recursive function with updated values
         }
-
-        //create current row with possible values and current row passed to function call
-        var curRow = [row, columnChoices[i]];
-        //splice out current i element from column choices
-        columnChoices.splice(i, 1);
-        currentGameValues.push(curRow);
-        usedMinDiags.push(min); 
-        usedMajDiags.push(maj); 
-        //pass remaining values to next recursion
-        fillBoard(row + 1, columnChoices, usedMinDiags, usedMajDiags, currentGameValues);
+        //call function to recurse to next level!
+        //values will be updated by previous if statement if a value was found 
+        fillBoard(row + 1, columnChoices, usedMinDiags, usedMajDiags, posSolution);
       }
     } else {
-      if (currentGameValues.length === n) {
+      if (Array.isArray(currentGameValues) && currentGameValues.length === n) {
         solutions.push(currentGameValues);
       }
       return;
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // if (n === 2) {
+    //   debugger;
+    // }
+
+    // currentGameValues = currentGameValues || [];
+    // if (currentGameValues.length === n) {
+    //   solutions.push(currentGameValues);
+    //   return;
+    // }
+    // if (row < n) {
+    //   //loop through elements in possibleColumns
+    //   for (var i = 0; i < possibleColumns.length; i++) {
+    //     var curSolutionAttempt = currentGameValues || [];
+    //     var columnChoices = possibleColumns.slice(); // Copy of the array
+    //     var usedMinDiags = minDiags.slice();
+    //     var usedMajDiags = majDiags.slice();
+    //     var min = columnChoices[i] - row;
+    //     var maj = columnChoices[i] + row; 
+
+    //     if (usedMinDiags.includes(min) !== true && usedMajDiags.includes(maj) !== true) {
+    //       currentGameValues.push([row, columnChoices[i]]);
+    //       usedMinDiags.push(min); 
+    //       usedMajDiags.push(maj); 
+    //       columnChoices.splice(i, 1);
+    //       fillBoard(row + 1, columnChoices, usedMinDiags, usedMajDiags, currentGameValues);
+    //     } else if (i === columnChoices.length - 1) { //if we have checked whole row and not found working space
+    //       //we have to pass in all possible columns as it was before we finished up this row
+    //       fillBoard(row + 1, columnChoices, usedMinDiags, usedMajDiags, currentGameValues);
+    //     }
+    //   }
+    // } else {
+    //   return;
+    // }
   };
 
   fillBoard(0, possibleColumns, minDiags, majDiags);
