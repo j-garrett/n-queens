@@ -39,23 +39,21 @@ window.findNRooksSolution = function(n) {
 };
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solutions = [];
-
-  var fillBoard = function(row, possibleColumns, currentGameValues) {
-    if (possibleColumns.length > 0) {
+  var fillBoard = function(row, possibleColumns) {
+    if (row < n) {
       for (var i = 0; i < possibleColumns.length; i++) {
         var columnChoices = possibleColumns.slice();
         columnChoices.splice(i, 1);
-        currentGameValues.push([row, columnChoices[i]]);
-        fillBoard(row + 1, columnChoices, currentGameValues);
+        fillBoard(row + 1, columnChoices);
       }
     } else {
-      solutions.push(currentGameValues);
+      solutions++;
       return;
     }
   };
-  fillBoard(0, _.range(n), []);
-  return solutions.length;
+  var solutions = 0;
+  fillBoard(0, _.range(n));
+  return solutions;
 };
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
@@ -80,49 +78,32 @@ window.findNQueensSolution = function(n) {
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
   var start = new Date();
-  if (n === 0) {
-    return 1;
-  }
-  var solutions = [];
-  var fillBoard = function(row, possibleColumns, minDiags, majDiags, currentGameValues) {
-    if (n === 4) {
-      debugger;
-    }
-    var posSolution = currentGameValues.slice();
-    var usedMinDiags = minDiags.slice();
-    var usedMajDiags = majDiags.slice();
+  var solutions = 0;
+  var fillBoard = function(row, possibleColumns, possibleMinor, possibleMajor) {
     if (row < n) {
-      // debugger;
       for (var i = 0; i < possibleColumns.length; i++) {
         var columnChoices = possibleColumns.slice();
-        var minDiag = columnChoices[i] - row;
-        var majDiag = columnChoices[i] + row;
-        //if current value does not conflict with used diagonal indexes
-        if (usedMinDiags.includes(minDiag) !== true && usedMajDiags.includes(majDiag) !== true) {
-          //push current value to possible solutions
-          posSolution.push([row, columnChoices[i]]);
-          //update used Diagonals
-          usedMinDiags.push(minDiag);
-          usedMajDiags.push(majDiag);
-          //remove index from future possible columns
+        var minorChoices = possibleMinor.slice();
+        var majorChoices = possibleMajor.slice();
+        var minDiag = possibleColumns[i] - row;
+        var majDiag = possibleColumns[i] + row;
+        if(minorChoices.indexOf(minDiag) === -1 && majorChoices.indexOf(majDiag) === -1) {
           columnChoices.splice(i, 1);
-          //call function to recurse to next level!
-          //values will be updated by previous if statement if a value was found 
-          fillBoard(row + 1, columnChoices, usedMinDiags, usedMajDiags, posSolution);
+          minorChoices.push(minDiag);
+          majorChoices.push(majDiag);          
         }
+        fillBoard(row + 1, columnChoices, minorChoices, majorChoices);
       }
+    } else if(possibleColumns.length === 0) {
+      solutions++;
+      return;
     } else {
-      if (Array.isArray(posSolution) && posSolution.length === n) {
-        solutions.push(posSolution);
-      }
       return;
     }
   };
-  fillBoard(0, _.range(n), [], [], []);
-  debugger;
+  fillBoard(0, _.range(n), [], []);
   var end = new Date();
   console.log('Time to solve: ', end - start);
-  console.log('Number of solutions for ' + n + ' queens:', solutions.length);
-  return solutions.length;
-
+  console.log('Number of solutions for ' + n + ' queens:', solutions);
+  return solutions;
 };
